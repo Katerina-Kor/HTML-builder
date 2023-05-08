@@ -74,25 +74,27 @@ function buildPage() {
     const copyDirProm = promises.mkdir(copyDirName, {recursive: true});
     copyDirProm.catch(error => console.log(error));
 
-    const initialDirFiles = promises.readdir(dirName);
-    initialDirFiles.then(
-      result => {
-        result.forEach(file => {
-          let filePath = path.join(dirName, file);
-          fs.stat(filePath, (err, res) => {
-            if(err) throw Error;
-            if(res.isDirectory()) {
-              copyDir(filePath, path.join(copyDirName, file));
-            } else {
-              let src = path.join(dirName, file);
-              let dest = path.join(copyDirName, file);
-              promises.copyFile(src, dest);
-            }
+    copyDirProm.then( () => {
+      const initialDirFiles = promises.readdir(dirName);
+      initialDirFiles.then(
+        result => {
+          result.forEach(file => {
+            let filePath = path.join(dirName, file);
+            fs.stat(filePath, (err, res) => {
+              if(err) throw Error;
+              if(res.isDirectory()) {
+                copyDir(filePath, path.join(copyDirName, file));
+              } else {
+                let src = path.join(dirName, file);
+                let dest = path.join(copyDirName, file);
+                promises.copyFile(src, dest);
+              }
+            })
           })
-        })
-      },
-      error => console.log(error)
-    )
+        },
+        error => console.log(error)
+      )
+    })
   }
 
   createHtmlFile();
